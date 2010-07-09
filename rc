@@ -1,0 +1,236 @@
+#!/usr/bin/env python
+
+import sys
+import math
+from copy import copy
+
+bin = "01"
+hexa = "0123456789ABCDEFabcdef"
+
+class rc_stack:
+
+    def __init__(self):
+
+        self.cmds = {}
+        self.stack = []
+        self.base = "dec"
+
+        # stack manipulation
+        self.cmds['pop'] =      self.pop
+        self.cmds['dump'] =     self.dump
+        self.cmds['d'] =        self.dump
+        self.cmds['p'] =        self.print_last
+        self.cmds['print'] =    self.print_last
+        self.cmds['r'] =        self.swap
+        self.cmds['swap'] =     self.swap
+        self.cmds['c'] =        self.clear
+        self.cmds['clear'] =     self.clear
+
+        # change output base
+        self.cmds['hex'] =      self.hex
+        self.cmds['bin'] =      self.bin
+        self.cmds['dec'] =      self.dec
+
+        # control
+        self.cmds['quit'] =     self.quit
+        self.cmds['q'] =        self.quit
+
+        # operations
+        self.cmds['+'] =        self.add
+        self.cmds['-'] =        self.sub
+        self.cmds['/'] =        self.div
+        self.cmds['*'] =        self.mul
+        self.cmds['x'] =        self.mul
+        self.cmds['%'] =        self.mod
+        self.cmds['^'] =        self.pow
+
+        # binary operations
+        self.cmds['&'] =        self.bin_and
+        self.cmds['^'] =        self.bin_xor
+        self.cmds['|'] =        self.bin_or
+        self.cmds['<<'] =       self.lsh
+        self.cmds['>>'] =       self.rsh
+
+
+    # command to execute
+    def pop(self):
+        if len(self.stack) > 0:
+            print "pop: " + self.stack.pop()
+        else:
+            print "No item, cannot pop"
+
+    def dump(self):
+        for i in self.stack:
+            print i
+
+    def print_last(self):
+        if len(self.stack) > 0:
+            print self.stack[len(self.stack) - 1]
+
+    def swap(self):
+        if len(self.stack) >= 2:
+            a = self.stack.pop()
+            b = self.stack.pop()
+            self.stack.append(a) 
+            self.stack.append(b) 
+    def clear(self):
+        while len(self.stack) > 0:
+            self.stack.pop()
+
+    def hex(self):
+        self.base = "hex"
+
+    def bin(self):
+        self.base = "bin"
+
+    def dec(self):
+        self.base = "dec"
+
+    def quit(self):
+        print "Bye."
+        sys.exit()
+
+    def stack_in_base(self, v):
+        if self.base == "hex":
+            self.stack.append(str(hex(v)))
+        elif self.base == "bin":
+            count = 64
+            a = "".join([str((v >> y) & 1) for y in range(count-1, -1, -1)]).lstrip('0')
+            self.stack.append("0b" + a)
+        else:
+            self.stack.append(v.__str__())
+
+    def add(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] + values[0]
+        self.stack_in_base(res)
+
+    def sub(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] - values[0]
+        self.stack_in_base(res)
+
+    def div(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] / values[0]
+        self.stack_in_base(res)
+
+    def mul(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] * values[0]
+        self.stack_in_base(res)
+
+    def mod(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] % values[0]
+        self.stack_in_base(res)
+
+    def pow(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = math.pow(values[1], values[0])
+        self.stack_in_base(res)
+
+    def bin_and(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] & values[0]
+        self.stack_in_base(res)
+
+    def bin_xor(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] ^ values[0]
+        self.stack_in_base(res)
+
+    def bin_or(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] | values[0]
+        self.stack_in_base(res)
+
+    def lsh(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] << values[0]
+        self.stack_in_base(res)
+
+    def rsh(self):
+        if len(self.stack) < 2:
+            return
+        values = self.get_top_2_as_dec()
+        res = values[1] >> values[0]
+        self.stack_in_base(res)
+
+    def get_top_2_as_dec(self):
+        ret = []
+        ret.append(self.get_as_dec(self.stack.pop()))
+        ret.append(self.get_as_dec(self.stack.pop()))
+        return ret
+
+    def get_as_dec(self, v):
+            if v.isdigit():
+                return int(v, 10)
+            if v.startswith("0x"):
+                return int(v, 16)
+            if v.startswith("0b"):
+                v = v.lstrip("0b")
+                return int(v, 2)
+
+    # process
+    def process(self, v):
+        if self.cmds.__contains__(v):
+            if self.cmds[v]() == 0:
+                return 0
+        return -1
+
+    # accessors
+    def get_base(self):
+        return self.base
+
+    def push(self, v):
+        self.stack.append(v)
+
+s = rc_stack()
+while 1:
+    sys.stdout.write("[%s] rc> " % (s.get_base()))
+    input = sys.stdin.readline().split()
+    for i in input:
+        if s.process(i) == 0:
+            continue
+        if i.isdigit():
+            s.push(i)
+            continue
+        if i.startswith("0b"):
+            tmp = i.lstrip("0b")
+            s.push(i)
+            for c in tmp:
+                if bin.__contains__(c) != True:
+                    s.pop()
+                    print "Not a valid binary value"
+                    break
+            continue
+        if i.startswith("0x"):
+            tmp = i.lstrip("0x")
+            s.push(i)
+            for c in tmp:
+                if hexa.__contains__(c) != True:
+                    s.pop()
+                    print "not a valid hexadecimal value"
+                    break
+            continue
