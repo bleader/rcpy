@@ -47,7 +47,7 @@ class rc_stack:
 
         # binary operations
         self.cmds['&'] =        self.bin_and
-        self.cmds['^'] =        self.bin_xor
+        self.cmds['xor'] =      self.bin_xor
         self.cmds['|'] =        self.bin_or
         self.cmds['<<'] =       self.lsh
         self.cmds['>>'] =       self.rsh
