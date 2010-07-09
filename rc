@@ -24,7 +24,8 @@ class rc_stack:
         self.cmds['r'] =        self.swap
         self.cmds['swap'] =     self.swap
         self.cmds['c'] =        self.clear
-        self.cmds['clear'] =     self.clear
+        self.cmds['clear'] =    self.clear
+	self.cmds['conv'] = 	self.conv
 
         # change output base
         self.cmds['hex'] =      self.hex
@@ -73,9 +74,15 @@ class rc_stack:
             b = self.stack.pop()
             self.stack.append(a) 
             self.stack.append(b) 
+
     def clear(self):
         while len(self.stack) > 0:
             self.stack.pop()
+
+    def conv(self):
+	a = self.stack.pop()
+	self.stack_in_base(self.get_as_dec(a))
+	print a + " -> " + self.stack[len(self.stack) - 1]
 
     def hex(self):
         self.base = "hex"
