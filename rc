@@ -26,6 +26,7 @@ class rc_stack:
         self.cmds['c'] =        self.clear
         self.cmds['clear'] =    self.clear
         self.cmds['conv'] =     self.conv
+        self.cmds['int'] =      self.integer
 
         # change output base
         self.cmds['hex'] =      self.hex
@@ -81,8 +82,18 @@ class rc_stack:
 
     def conv(self):
         a = self.stack.pop()
+        if self.isfloat(a):
+            print "No conversion suppor for float"
+            return
         self.stack_in_base(self.get_as_dec(a))
         print a + " -> " + self.stack[len(self.stack) - 1]
+
+    def integer(self):
+        tmp = self.stack.pop()
+        if self.isfloat(tmp):
+            self.stack.append(int(float(tmp)))
+        else:
+            print "not a float"
 
     def hex(self):
         self.base = "hex"
@@ -124,7 +135,9 @@ class rc_stack:
     def div(self):
         if len(self.stack) < 2:
             return
-        values = self.get_top_2_as_dec()
+        values = self.get_top_2_as_float()
+        if values == None:
+            values = self.get_top_2_as_dec()
         res = values[1] / values[0]
         self.stack_in_base(res)
 
@@ -191,13 +204,50 @@ class rc_stack:
         return ret
 
     def get_as_dec(self, v):
+        # first try int
         if v.isdigit():
             return int(v, 10)
+        # otherwise check for float
+        if self.isfloat(v):
+            return float(v)
+        # finally have a look at bases conversion
         if v.startswith("0x"):
             return int(v, 16)
         if v.startswith("0b"):
             v = v.lstrip("0b")
             return int(v, 2)
+
+    def get_top_2_as_float(self):
+        ret = []
+        ret.append(self.stack.pop())
+        ret.append(self.stack.pop())
+        tmp = self.get_as_float(ret[0])
+        if tmp == None:
+            self.stack.append(ret[1])
+            self.stack.append(ret[0])
+            return
+        tmp = self.get_as_float(ret[1])
+        if tmp == None:
+            self.stack.append(ret[1])
+            self.stack.append(ret[0])
+            return
+        ret[0] = float(ret[0])
+        ret[1] = float(ret[1])
+        return ret
+
+    def get_as_float(self, v):
+        try:
+            ret = float(v)
+            return ret
+        except ValueError:
+            return
+
+    def isfloat(self, v):
+        try:
+            a = float(v)
+            return True
+        except ValueError:
+            return False
 
     # process
     def process(self, v):
@@ -221,6 +271,9 @@ while 1:
         if s.process(i) == 0:
             continue
         if i.isdigit():
+            s.push(i)
+            continue
+        if s.isfloat(i):
             s.push(i)
             continue
         if i.startswith("0b"):
