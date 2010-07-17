@@ -1,0 +1,111 @@
+RC(1)									RC(1)
+
+
+NAME
+	rc - Raccoon Calulator / RPN calculator in python
+
+SYNOPSIS
+	rc
+
+	RC doesn't handle any parameter for now.
+
+DESCRIPTION
+	RC is a simple reverse-polish notation calculator written in python.
+	Its purpose was to add thing I felt were missing in dc(1) that I need
+	in my daily usage of a calculator.
+
+	It supports decimal, hexadecimal, binary as well as binary operation
+	on these values.
+
+COMMANDS
+	The following commands can be used in RC:
+
+	STACK HANDLING:
+	pop:	print and remove the value from stack
+
+	dump:	dump the current stack content
+	d:	same as `dump`
+
+	print:	print the value on top of stack
+	p:	same as `print`
+
+	swap:	swap the last 2 values on top of stack
+	r:	same as `swap`
+
+	clear:	empty the stack
+	c:	same as clear
+
+	Current mode is shown in the prompt, the used mode won't neither the
+	values already in stack nor the inputed values. If you add 0x42 to 
+	your stack while being in bin mode, the stack will still contains 0x42
+	but if you do an operation, the output will be in the chosen mode.
+	hex:	switch output of operations to hexadecimal
+	bin:	switch output of operations to binary
+	dec:	switch output of operations to decimal
+	conv:	convert value on top of the stack to the selected mode, this
+		command won't work on floating values
+
+	int:	convert a floating value to an integer
+
+	GENERIC COMMANDS:
+	quit:	quit RC
+	q:	same as `quit`
+
+	OPERATIONS:
+	+	Addition
+	-	Substraction
+	*	Multiplication
+	x	Multiplication
+	/	Division
+	%	Modulo
+	^	Power
+
+	All operation pop the two top values, and replace them by the result
+	of the operation in the stack.
+
+	BINARY OPERATIONS:
+	&	Logical and
+	|	Logical or
+	xor	Logical xor (^ being used for power)
+	<<	Shift to left
+	>>	Shift to right
+
+	All binary operation pop the two top values, and replace them by the
+	result of the operation in the stack.
+
+
+EXAMPLE
+	Sample session of RC:
+
+	[dec] rc> 10 20 30   
+	[dec] rc> dump
+	10
+	20
+	30
+	[dec] rc> + d
+	10
+	50
+	[dec] rc> hex
+	[hex] rc> + p
+	0x3c
+	[hex] rc> bin
+	[bin] rc> conv
+	0x3c -> 0b111100
+	[bin] rc> dec
+	[dec] rc> 7 / p
+	8
+	[dec] rc> 22 / p
+	0.363636363636
+	[dec] rc> 10.7 + p
+	11.0636363636
+	[dec] rc> 1 4 << 1 8 << | p
+	272
+	[dec] rc> hex
+	[hex] rc> conv
+	272 -> 0x110
+
+BUGS
+	Email bug reports to bleader@ratonland.org
+
+
+				2010-07-17				RC(1)
