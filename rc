@@ -82,7 +82,7 @@ class rc_stack:
 
     def conv(self):
         a = self.stack.pop()
-        if self.isfloat(a):
+        if not a.isdigit() and self.isfloat(a):
             print "No conversion suppor for float"
             return
         self.stack_in_base(self.get_as_dec(a))
