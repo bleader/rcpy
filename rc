@@ -3,6 +3,7 @@
 import sys
 import math
 from copy import copy
+import readline
 
 bin = "01"
 hexa = "0123456789ABCDEFabcdef"
@@ -264,9 +265,9 @@ class rc_stack:
         self.stack.append(v)
 
 s = rc_stack()
+readline.parse_and_bind('tab: complete')
 while 1:
-    sys.stdout.write("[%s] rc> " % (s.get_base()))
-    input = sys.stdin.readline().split()
+    input = raw_input("[%s] rc> " % (s.get_base())).split()
     for i in input:
         if s.process(i) == 0:
             continue
