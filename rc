@@ -19,7 +19,7 @@ class rc_stack:
         # stack manipulation
         self.cmds['pop'] =      self.pop
         self.cmds['dump'] =     self.dump
-        self.cmds['d'] =        self.dump
+        self.cmds['d'] =        self.duplicate
         self.cmds['p'] =        self.print_last
         self.cmds['print'] =    self.print_last
         self.cmds['r'] =        self.swap
@@ -65,6 +65,11 @@ class rc_stack:
     def dump(self):
         for i in self.stack:
             print i
+
+    def duplicate(self):
+        a = self.stack.pop()
+        self.stack.append(a)
+        self.stack.append(a)
 
     def print_last(self):
         if len(self.stack) > 0:
