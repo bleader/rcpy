@@ -46,6 +46,7 @@ class rc_stack:
         self.cmds['x'] =        self.mul
         self.cmds['%'] =        self.mod
         self.cmds['^'] =        self.pow
+        self.cmds['v'] =        self.sqr
 
         # binary operations
         self.cmds['&'] =        self.bin_and
@@ -167,6 +168,12 @@ class rc_stack:
         values = self.get_top_2_as_dec()
         res = math.pow(values[1], values[0])
         self.stack_in_base(res)
+
+    def sqr(self):
+        if len(self.stack) < 1:
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(math.sqrt(val))
 
     def bin_and(self):
         if len(self.stack) < 2:
