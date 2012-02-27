@@ -265,6 +265,9 @@ class rc_stack:
     # process
     def process(self, v):
         if self.cmds.__contains__(v):
+            if self.stack.__len__() == 0:
+                print "Stack is empty"
+                return -1
             if self.cmds[v]() == 0:
                 return 0
         return -1
