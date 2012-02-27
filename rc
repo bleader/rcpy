@@ -91,6 +91,7 @@ class rc_stack:
         a = self.stack.pop()
         if not a.isdigit() and self.isfloat(a):
             print "No conversion support for float"
+            self.stack.append(a)
             return
         self.stack_in_base(self.get_as_dec(a))
         print a + " -> " + self.stack[len(self.stack) - 1]
