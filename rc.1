@@ -1,113 +1,196 @@
-RC(1)									RC(1)
+.TH RC 1 "2010 Jul 17"
+.SH NAME
+rc \- Raccoon Calulator / RPN calculator in python
 
 
-NAME
-	rc - Raccoon Calulator / RPN calculator in python
-
-SYNOPSIS
-	rc
-
-	echo 10 20 + p | rc
-	30
-
-DESCRIPTION
-	RC is a simple reverse-polish notation calculator written in python.
-	Its purpose was to add thing I felt were missing in dc(1) that I need
-	in my daily usage of a calculator.
-
-	It supports decimal, hexadecimal, binary as well as binary operation
-	on these values.
-
-COMMANDS
-	The following commands can be used in RC:
-
-	STACK HANDLING:
-	pop:	print and remove the value from stack
-
-	dump:	dump the current stack content
-
-	d:	duplicate the top value of the stack
-
-	print:	print the value on top of stack
-	p:	same as `print`
-
-	swap:	swap the last 2 values on top of stack
-	r:	same as `swap`
-
-	clear:	empty the stack
-	c:	same as clear
-
-	Current mode is shown in the prompt, the used mode won't neither the
-	values already in stack nor the inputed values. If you add 0x42 to 
-	your stack while being in bin mode, the stack will still contains 0x42
-	but if you do an operation, the output will be in the chosen mode.
-	hex:	switch output of operations to hexadecimal
-	bin:	switch output of operations to binary
-	dec:	switch output of operations to decimal
-	conv:	convert value on top of the stack to the selected mode, this
-		command won't work on floating values
-
-	int:	convert a floating value to an integer
-
-	GENERIC COMMANDS:
-	quit:	quit RC
-	q:	same as `quit`
-
-	OPERATIONS:
-	+	Addition
-	-	Substraction
-	*	Multiplication
-	x	Multiplication
-	/	Division
-	%	Modulo
-	^	Power
-	v	Square root
-
-	All operation pop the two top values, and replace them by the result
-	of the operation in the stack.
-
-	BINARY OPERATIONS:
-	&	Logical and
-	|	Logical or
-	xor	Logical xor (^ being used for power)
-	<<	Shift to left
-	>>	Shift to right
-
-	All binary operation pop the two top values, and replace them by the
-	result of the operation in the stack.
+.SH SYNOPSIS
+.br
+.B rc
+.br
+.B echo 10 20 + p | rc
+.br
 
 
-EXAMPLE
-	Sample session of RC:
+.SH DESCRIPTION
+.B RC
+is a simple reverse-polish notation calculator written in python.
+Its purpose was to add thing I felt were missing in dc(1) that I need
+in my daily usage of a calculator.
+.P
+It supports decimal, hexadecimal, binary as well as binary operation
+on these values.
 
-	[dec] rc> 10 20 30   
-	[dec] rc> dump
-	10
-	20
-	30
-	[dec] rc> + d
-	10
-	50
-	[dec] rc> hex
-	[hex] rc> + p
-	0x3c
-	[hex] rc> bin
-	[bin] rc> conv
-	0x3c -> 0b111100
-	[bin] rc> dec
-	[dec] rc> 7 / p
-	8
-	[dec] rc> 22 / p
-	0.363636363636
-	[dec] rc> 10.7 + p
-	11.0636363636
-	[dec] rc> 1 4 << 1 8 << | p
-	272
-	[dec] rc> hex
-	[hex] rc> conv
-	272 -> 0x110
 
-BUGS
+.SH STACK HANDLING
+.TP 9
+pop:
+print and remove the value from stack
+.TP
+dump:
+dump the current stack content
+.TP
+d:
+duplicate the top value of the stack
+.TP
+print:
+print the value on top of stack
+.TP
+p:
+same as `print`
+.TP
+swap:
+swap the last 2 values on top of stack
+.TP
+r:
+same as `swap`
+.TP
+clear:
+empty the stack
+.TP
+c:
+same as clear
+.P
+Current mode is shown in the prompt, the used mode won't neither the
+values already in stack nor the inputed values. If you add 0x42 to 
+your stack while being in bin mode, the stack will still contains 0x42
+but if you do an operation, the output will be in the chosen mode.
+.TP 9
+hex:
+switch output of operations to hexadecimal
+.TP
+bin:
+switch output of operations to binary
+.TP
+dec:
+switch output of operations to decimal
+.TP
+conv:
+convert value on top of the stack to the selected mode, this command won't work
+on floating values
+.TP
+int:
+convert a floating value to an integer
+
+
+.SH GENERIC COMMANDS
+.TP 9
+quit:
+quit RC
+.TP
+q:
+same as `quit`
+
+.SH OPERATIONS
+.TP 9
++
+Addition
+.TP
+-
+Substraction
+.TP
+*
+Multiplication
+.TP
+x
+Multiplication
+.TP
+/
+Division
+.TP
+%
+Modulo
+.TP
+^
+Power
+.TP
+v
+Square root
+
+
+.P
+All operation pop the two top values, and replace them by the result
+of the operation in the stack.
+
+.SH BINARY OPERATIONS
+.TP 9
+&
+Logical and
+.TP
+|
+Logical or
+.TP
+xor
+Logical xor (^ being used for power)
+.TP
+<<
+Shift to left
+.TP
+>>
+Shift to right
+
+.P
+All binary operation pop the two top values, and replace them by the
+result of the operation in the stack.
+
+
+.SH EXAMPLE
+.P
+Sample session of RC:
+.P
+[dec] rc> 10 20 30   
+.br
+[dec] rc> dump
+.br
+10
+.br
+20
+.br
+30
+.br
+[dec] rc> + d
+.br
+10
+.br
+50
+.br
+[dec] rc> hex
+.br
+[hex] rc> + p
+.br
+0x3c
+.br
+[hex] rc> bin
+.br
+[bin] rc> conv
+.br
+0x3c -> 0b111100
+.br
+[bin] rc> dec
+.br
+[dec] rc> 7 / p
+.br
+8
+.br
+[dec] rc> 22 / p
+.br
+0.363636363636
+.br
+[dec] rc> 10.7 + p
+.br
+11.0636363636
+.br
+[dec] rc> 1 4 << 1 8 << | p
+.br
+272
+.br
+[dec] rc> hex
+.br
+[hex] rc> conv
+.br
+272 -> 0x110
+.br
+
+.SH BUGS
 	Email bug reports to bleader@ratonland.org
 
 
