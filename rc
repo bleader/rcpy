@@ -56,6 +56,9 @@ class rc_stack:
         self.cmds['<<'] =       self.lsh
         self.cmds['>>'] =       self.rsh
 
+        self.cmds['help'] =     self.help
+        self.cmds['h'] =        self.help
+
 
     # command to execute
     def pop(self):
@@ -127,6 +130,12 @@ class rc_stack:
     def quit(self):
         print("Bye.")
         sys.exit()
+
+    def help(self):
+        if os.path.isfile("./rc.1"):
+            os.system("man ./rc.1")
+        else:
+            os.system("man rc")
 
     def stack_in_base(self, v):
         if self.base == "hex":
