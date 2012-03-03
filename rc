@@ -60,17 +60,17 @@ class rc_stack:
     # command to execute
     def pop(self):
         if len(self.stack) > 0:
-            print "pop: " + self.stack.pop()
+            print("pop: " + self.stack.pop())
         else:
-            print "No element in stack to  pop\n"
+            print("No element in stack to  pop\n")
 
     def dump(self):
         for i in self.stack:
-            print i
+            print(i)
 
     def duplicate(self):
         if self.stack.__len__() == 0:
-            print "Stack is empty\n"
+            print("Stack is empty\n")
             return -1
         a = self.stack.pop()
         self.stack.append(a)
@@ -78,7 +78,7 @@ class rc_stack:
 
     def print_last(self):
         if len(self.stack) > 0:
-            print self.stack[len(self.stack) - 1]
+            print(self.stack[len(self.stack) - 1])
 
     def swap(self):
         if len(self.stack) >= 2:
@@ -87,7 +87,7 @@ class rc_stack:
             self.stack.append(a) 
             self.stack.append(b) 
         else:
-            print "Need at least 2 element in stack\n"
+            print("Need at least 2 element in stack\n")
 
     def clear(self):
         while len(self.stack) > 0:
@@ -95,25 +95,25 @@ class rc_stack:
 
     def conv(self):
         if self.stack.__len__() == 0:
-            print "Stack is empty\n"
+            print("Stack is empty\n")
             return -1
         a = self.stack.pop()
         if not a.isdigit() and self.isfloat(a):
-            print "No conversion support for float"
+            print("No conversion support for float")
             self.stack.append(a)
             return
         self.stack_in_base(self.get_as_dec(a))
-        print a + " -> " + self.stack[len(self.stack) - 1]
+        print(a + " -> " + self.stack[len(self.stack) - 1])
 
     def integer(self):
         if self.stack.__len__() == 0:
-            print "Stack is empty\n"
+            print("Stack is empty\n")
             return -1
         tmp = self.stack.pop()
         if self.isfloat(tmp):
             self.stack.append(int(float(tmp)))
         else:
-            print "not a float"
+            print("not a float")
 
     def hex(self):
         self.base = "hex"
@@ -125,7 +125,7 @@ class rc_stack:
         self.base = "dec"
 
     def quit(self):
-        print "Bye."
+        print("Bye.")
         sys.exit()
 
     def stack_in_base(self, v):
@@ -140,7 +140,7 @@ class rc_stack:
 
     def add(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] + values[0]
@@ -148,7 +148,7 @@ class rc_stack:
 
     def sub(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] - values[0]
@@ -156,7 +156,7 @@ class rc_stack:
 
     def div(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_float()
         if values == None:
@@ -166,7 +166,7 @@ class rc_stack:
 
     def mul(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] * values[0]
@@ -174,7 +174,7 @@ class rc_stack:
 
     def mod(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] % values[0]
@@ -182,7 +182,7 @@ class rc_stack:
 
     def pow(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = math.pow(values[1], values[0])
@@ -190,14 +190,14 @@ class rc_stack:
 
     def sqr(self):
         if len(self.stack) < 1:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(math.sqrt(val))
 
     def bin_and(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] & values[0]
@@ -205,7 +205,7 @@ class rc_stack:
 
     def bin_xor(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] ^ values[0]
@@ -213,7 +213,7 @@ class rc_stack:
 
     def bin_or(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] | values[0]
@@ -221,7 +221,7 @@ class rc_stack:
 
     def lsh(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] << values[0]
@@ -229,7 +229,7 @@ class rc_stack:
 
     def rsh(self):
         if len(self.stack) < 2:
-            print "Not enough element in stack\n"
+            print("Not enough element in stack\n")
             return
         values = self.get_top_2_as_dec()
         res = values[1] >> values[0]
@@ -317,7 +317,7 @@ def input_processing(input):
             for c in tmp:
                 if bin.__contains__(c) != True:
                     s.pop()
-                    print "Not a valid binary value"
+                    print("Not a valid binary value")
                     break
             continue
         if i.startswith("0x"):
@@ -326,19 +326,21 @@ def input_processing(input):
             for c in tmp:
                 if hexa.__contains__(c) != True:
                     s.pop()
-                    print "not a valid hexadecimal value"
+                    print("not a valid hexadecimal value")
                     break
             continue
 
 s = rc_stack()
-if not os.isatty(file.fileno(sys.stdin)):
+if not os.isatty((sys.stdin.fileno())):
     input = sys.stdin.readlines()
     for i in input:
         input_processing(i.split())
 else:
     readline.parse_and_bind('tab: complete')
     while 1:
-        input = raw_input("[%s] rc> " % (s.get_base())).split()
+        sys.stdout.write("[%s] rc> " % (s.get_base()))
+        sys.stdout.flush()
+        input = sys.stdin.readline().split()
         input_processing(input)
 
 # vim: ts=4 sw=4 et
