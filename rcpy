@@ -132,10 +132,10 @@ class rc_stack:
         sys.exit()
 
     def help(self):
-        if os.path.isfile("./rc.1"):
-            os.system("man ./rc.1")
+        if os.path.isfile("./rcpy.1"):
+            os.system("man ./rcpy.1")
         else:
-            os.system("man rc")
+            os.system("man rcpy")
 
     def stack_in_base(self, v):
         if self.base == "hex":
@@ -347,7 +347,7 @@ if not os.isatty((sys.stdin.fileno())):
 else:
     readline.parse_and_bind('tab: complete')
     while 1:
-        sys.stdout.write("[%s] rc> " % (s.get_base()))
+        sys.stdout.write("[%s] rcpy> " % (s.get_base()))
         sys.stdout.flush()
         input = sys.stdin.readline().split()
         input_processing(input)

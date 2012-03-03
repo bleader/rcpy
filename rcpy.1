@@ -1,18 +1,18 @@
 .TH RC 1 "2010 Jul 17"
 .SH NAME
-rc \- Raccoon Calulator / RPN calculator in python
+rcpy \- Raccoon Calulator in Python / RPN calculator in python
 
 
 .SH SYNOPSIS
 .br
-.B rc
+.B rcpy
 .br
-.B echo 10 20 + p | rc
+.B echo 10 20 + p | rcpy
 .br
 
 
 .SH DESCRIPTION
-.B RC
+.B RCPY
 is a simple reverse-polish notation calculator written in python.
 Its purpose was to add thing I felt were missing in dc(1) that I need
 in my daily usage of a calculator.
@@ -137,9 +137,9 @@ result of the operation in the stack.
 .P
 Sample session of RC:
 .P
-[dec] rc> 10 20 30   
+[dec] rcpy> 10 20 30   
 .br
-[dec] rc> dump
+[dec] rcpy> dump
 .br
 10
 .br
@@ -147,45 +147,45 @@ Sample session of RC:
 .br
 30
 .br
-[dec] rc> + d
+[dec] rcpy> + d
 .br
 10
 .br
 50
 .br
-[dec] rc> hex
+[dec] rcpy> hex
 .br
-[hex] rc> + p
+[hex] rcpy> + p
 .br
 0x3c
 .br
-[hex] rc> bin
+[hex] rcpy> bin
 .br
-[bin] rc> conv
+[bin] rcpy> conv
 .br
 0x3c -> 0b111100
 .br
-[bin] rc> dec
+[bin] rcpy> dec
 .br
-[dec] rc> 7 / p
+[dec] rcpy> 7 / p
 .br
 8
 .br
-[dec] rc> 22 / p
+[dec] rcpy> 22 / p
 .br
 0.363636363636
 .br
-[dec] rc> 10.7 + p
+[dec] rcpy> 10.7 + p
 .br
 11.0636363636
 .br
-[dec] rc> 1 4 << 1 8 << | p
+[dec] rcpy> 1 4 << 1 8 << | p
 .br
 272
 .br
-[dec] rc> hex
+[dec] rcpy> hex
 .br
-[hex] rc> conv
+[hex] rcpy> conv
 .br
 272 -> 0x110
 .br
