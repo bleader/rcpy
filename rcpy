@@ -17,6 +17,7 @@ class rc_stack:
         self.stack = []
         self.macros = {}
         self.base = "dec"
+        self.tty = True
 
         # stack manipulation
         self.cmds['pop'] =      self.pop
@@ -107,7 +108,10 @@ class rc_stack:
             self.stack.append(a)
             return
         self.stack_in_base(self.get_as_dec(a))
-        print(a + " -> " + self.stack[len(self.stack) - 1])
+        if self.tty:
+            print(a + " -> " + self.stack[len(self.stack) - 1])
+        else:
+            print(self.stack[len(self.stack) - 1])
 
     def integer(self):
         if self.stack.__len__() == 0:
@@ -373,6 +377,7 @@ else:
     rc_input = raw_input
 
 if not os.isatty((sys.stdin.fileno())):
+    s.set_tty(False)
     data = sys.stdin.readlines()
     for i in data:
         input_processing(i.split())
