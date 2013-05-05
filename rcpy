@@ -340,16 +340,25 @@ def input_processing(input):
             continue
 
 s = rc_stack()
+
+# check if we are python2 on 3 to use input or raw_input
+# which allow for up/down arrows
+if sys.version_info[0] >= 3:
+    rc_input = input
+else:
+    rc_input = raw_input
+
 if not os.isatty((sys.stdin.fileno())):
-    input = sys.stdin.readlines()
-    for i in input:
+    data = sys.stdin.readlines()
+    for i in data:
         input_processing(i.split())
+
 else:
     readline.parse_and_bind('tab: complete')
+    readline.parse_and_bind('set editing-mode emacs')
     while 1:
-        sys.stdout.write("[%s] rcpy> " % (s.get_base()))
-        sys.stdout.flush()
-        input = sys.stdin.readline().split()
-        input_processing(input)
+        data = rc_input("[%s] rcpy> " % (s.get_base()))
+        data = data.split()
+        input_processing(data)
 
 # vim: ts=4 sw=4 et
