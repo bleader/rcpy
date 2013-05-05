@@ -103,7 +103,17 @@ BINARY OPERATIONS
 All binary operation pop the two top values, and replace them by the result of
 the operation in the stack.
 
+MACROS
+------
 
+Rcpy can handle some macros, the handling of this is quite basic and may leave
+room for improvements.
+
+::
+
+  m:       register macro, m id op1 op2...  This can be used at any given time, but the macro will store all commands following the id until the end of the line.
+
+  @:       call back a macro '@ id'
 
 EXAMPLE
 -------
@@ -136,4 +146,9 @@ Sample session of RC::
   [dec] rcpy> hex
   [hex] rcpy> conv
   272 -> 0x110
+  [dec] rcpy> m a / 1000 * p
+  [dec] rcpy> 3.95 300 @ a
+  13.166666666666666
+  [dec] rcpy> 2.68 200 @ a
+  13.4
 
