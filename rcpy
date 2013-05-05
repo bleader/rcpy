@@ -15,6 +15,7 @@ class rc_stack:
 
         self.cmds = {}
         self.stack = []
+        self.macros = {}
         self.base = "dec"
 
         # stack manipulation
@@ -310,8 +311,31 @@ class rc_stack:
     def push(self, v):
         self.stack.append(v)
 
+    def set_macro(self, v):
+        self.macros[v[0]] = v[1:]
+
+    def get_macro(self, v):
+        if v in self.macros:
+            return self.macros[v]
+        return []
+
+    def set_tty(self, v):
+        self.tty = v
+
 def input_processing(input):
     for i in input:
+        if i == 'm':
+            idx = input.index(i)
+            if len(input[idx+1:]) > 1:
+                s.set_macro(input[idx+1:])
+                input.clear()
+            continue
+        if i == '@':
+            idx = input.index(i)
+            if len(input[idx+1:]) > 0:
+                input_processing(s.get_macro(input[idx+1]))
+                input.pop(idx)
+            continue
         if s.process(i) == 0:
             continue
         if i.isdigit():

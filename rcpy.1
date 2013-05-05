@@ -1,4 +1,4 @@
-.TH RC 1 "2010 Jul 17"
+.TH RC 1 "2013 May 5"
 .SH NAME
 rcpy \- Raccoon Calulator in Python / RPN calculator in python
 
@@ -132,6 +132,18 @@ Shift to right
 All binary operation pop the two top values, and replace them by the
 result of the operation in the stack.
 
+.SH MACROS
+.P
+Rcpy can handle some macros, the handling of this is quite basic and may leave
+room for improvements.
+.TP
+m:
+register macro, m id op1 op2... 
+This can be used at any given time, but the macro will store all commands
+following the id until the end of the line.
+.TP
+@:
+call back a macro '@ id'
 
 .SH EXAMPLE
 .P
@@ -189,9 +201,21 @@ Sample session of RC:
 .br
 272 -> 0x110
 .br
+.br
+[dec] rcpy> m a / 1000 * p
+.br
+[dec] rcpy> 3.95 300 @ a
+.br
+13.166666666666666
+.br
+[dec] rcpy> 2.68 200 @ a
+.br
+13.4
+.br
+
 
 .SH BUGS
 	Email bug reports to bleader@ratonland.org
 
 
-				2010-07-17				RC(1)
+				2013-05-05				RC(1)
