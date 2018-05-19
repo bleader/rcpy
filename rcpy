@@ -61,6 +61,17 @@ class rc_stack:
         self.cmds['help'] =     self.help
         self.cmds['h'] =        self.help
 
+        # conversions
+        self.cmds['cm2in'] =    self.cm2in
+        self.cmds['in2cm'] =    self.in2cm
+        self.cmds['km2mi'] =    self.km2mi
+        self.cmds['mi2km'] =    self.mi2km
+        self.cmds['m2y'] =      self.m2y
+        self.cmds['y2m'] =      self.y2m
+        self.cmds['kg2lbs'] =   self.kg2lbs
+        self.cmds['lbs2kg'] =   self.lbs2kg
+        self.cmds['c2f'] =      self.c2f
+        self.cmds['f2c'] =      self.f2c
 
     # command to execute
     def pop(self):
@@ -208,6 +219,76 @@ class rc_stack:
             return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(math.sqrt(val))
+
+    def in2cm(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(2.54 * val)
+
+    def cm2in(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(0.393700787 * val)
+
+    def km2mi(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(0.621371192 * val)
+
+    def mi2km(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(1.609344 * val)
+
+    def m2y(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(1.0936133 * val)
+
+    def y2m(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(0.9144 * val)
+
+    def kg2lbs(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(2.20462262 * val)
+
+    def lbs2kg(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base(0.45359237 * val)
+
+    def c2f(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base((val * 1.8) + 32)
+
+    def f2c(self):
+        if len(self.stack) < 1:
+            print("Not enough element in stack\n")
+            return
+        val = self.get_as_dec(self.stack.pop())
+        self.stack_in_base((val - 32) /  1.8)
 
     def bin_and(self):
         if len(self.stack) < 2:
