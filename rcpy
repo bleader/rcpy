@@ -14,105 +14,93 @@ class rc_stack:
     def __init__(self):
 
         self.cmds = {}
+        self.lens = {}
         self.stack = []
         self.macros = {}
         self.base = "dec"
         self.tty = True
 
         # stack manipulation
-        self.cmds['pop'] =      self.pop
-        self.cmds['dump'] =     self.dump
-        self.cmds['d'] =        self.duplicate
-        self.cmds['p'] =        self.print_last
-        self.cmds['print'] =    self.print_last
-        self.cmds['r'] =        self.swap
-        self.cmds['swap'] =     self.swap
-        self.cmds['c'] =        self.clear
-        self.cmds['clear'] =    self.clear
-        self.cmds['conv'] =     self.conv
-        self.cmds['int'] =      self.integer
+        self.cmds['pop'], self.lens['pop'] =            self.pop,       1
+        self.cmds['dump'], self.lens['dump'] =          self.dump,      0
+        self.cmds['d'], self.lens['d'] =                self.duplicate, 1
+        self.cmds['p'], self.lens['p'] =                self.print_last,1
+        self.cmds['print'], self.lens['print'] =        self.print_last,1
+        self.cmds['r'], self.lens['r'] =                self.swap,      2
+        self.cmds['swap'], self.lens['swap'] =          self.swap,      2
+        self.cmds['c'], self.lens['c'] =                self.clear,     0
+        self.cmds['clear'], self.lens['clear'] =        self.clear,     0
+        self.cmds['conv'], self.lens['conv'] =          self.conv,      0
+        self.cmds['int'], self.lens['int'] =            self.integer,   1
 
         # change output base
-        self.cmds['hex'] =      self.hex
-        self.cmds['bin'] =      self.bin
-        self.cmds['dec'] =      self.dec
+        self.cmds['hex'], self.lens['hex'] =            self.hex,       0
+        self.cmds['bin'], self.lens['bin'] =            self.bin,       0
+        self.cmds['dec'], self.lens['dec'] =            self.dec,       0
 
         # control
-        self.cmds['quit'] =     self.quit
-        self.cmds['q'] =        self.quit
+        self.cmds['quit'], self.lens['quit'] =          self.quit,      0
+        self.cmds['q'], self.lens['q'] =                self.quit,      0
 
         # operations
-        self.cmds['+'] =        self.add
-        self.cmds['-'] =        self.sub
-        self.cmds['/'] =        self.div
-        self.cmds['*'] =        self.mul
-        self.cmds['x'] =        self.mul
-        self.cmds['%'] =        self.mod
-        self.cmds['^'] =        self.pow
-        self.cmds['v'] =        self.sqr
+        self.cmds['+'], self.lens['+'] =                self.add,       2
+        self.cmds['-'], self.lens['-'] =                self.sub,       2
+        self.cmds['/'], self.lens['/'] =                self.div,       2
+        self.cmds['*'], self.lens['*'] =                self.mul,       2
+        self.cmds['x'], self.lens['x'] =                self.mul,       2
+        self.cmds['%'], self.lens['%'] =                self.mod,       2
+        self.cmds['^'], self.lens['^'] =                self.pow,       2
+        self.cmds['v'], self.lens['v'] =                self.sqr,       1
 
         # binary operations
-        self.cmds['&'] =        self.bin_and
-        self.cmds['xor'] =      self.bin_xor
-        self.cmds['|'] =        self.bin_or
-        self.cmds['<<'] =       self.lsh
-        self.cmds['>>'] =       self.rsh
+        self.cmds['&'], self.lens['&'] =                self.bin_and,   2
+        self.cmds['xor'], self.lens['xor'] =            self.bin_xor,   2
+        self.cmds['|'], self.lens['|'] =                self.bin_or,    2
+        self.cmds['<<'], self.lens['<<'] =              self.lsh,       2
+        self.cmds['>>'], self.lens['>>'] =              self.rsh,       2
 
-        self.cmds['help'] =     self.help
-        self.cmds['h'] =        self.help
+        self.cmds['help'], self.lens['help'] =          self.help,      0
+        self.cmds['h'], self.lens['h'] =                self.help,      0
 
         # conversions
-        self.cmds['cm2in'] =    self.cm2in
-        self.cmds['in2cm'] =    self.in2cm
-        self.cmds['km2mi'] =    self.km2mi
-        self.cmds['mi2km'] =    self.mi2km
-        self.cmds['m2y'] =      self.m2y
-        self.cmds['y2m'] =      self.y2m
-        self.cmds['kg2lbs'] =   self.kg2lbs
-        self.cmds['lbs2kg'] =   self.lbs2kg
-        self.cmds['c2f'] =      self.c2f
-        self.cmds['f2c'] =      self.f2c
+        self.cmds['cm2in'], self.lens['cm2in'] =        self.cm2in,     1
+        self.cmds['in2cm'], self.lens['in2cm'] =        self.in2cm,     1
+        self.cmds['km2mi'], self.lens['km2mi'] =        self.km2mi,     1
+        self.cmds['mi2km'], self.lens['mi2km'] =        self.mi2km,     1
+        self.cmds['m2y'], self.lens['m2y'] =            self.m2y,       1
+        self.cmds['y2m'], self.lens['y2m'] =            self.y2m,       1
+        self.cmds['kg2lbs'], self.lens['kg2lbs'] =      self.kg2lbs,    1
+        self.cmds['lbs2kg'], self.lens['lbs2kg'] =      self.lbs2kg,    1
+        self.cmds['c2f'], self.lens['c2f'] =            self.c2f,       1
+        self.cmds['f2c'], self.lens['f2c'] =            self.f2c,       1
 
     # command to execute
     def pop(self):
-        if len(self.stack) > 0:
-            print("pop: " + self.stack.pop())
-        else:
-            print("No element in stack to  pop\n")
+        print("pop: " + self.stack.pop())
 
     def dump(self):
         for i in self.stack:
             print(i)
 
     def duplicate(self):
-        if self.stack.__len__() == 0:
-            print("Stack is empty\n")
-            return -1
         a = self.stack.pop()
         self.stack.append(a)
         self.stack.append(a)
 
     def print_last(self):
-        if len(self.stack) > 0:
-            print(self.stack[len(self.stack) - 1])
+        print(self.stack[len(self.stack) - 1])
 
     def swap(self):
-        if len(self.stack) >= 2:
-            a = self.stack.pop()
-            b = self.stack.pop()
-            self.stack.append(a) 
-            self.stack.append(b) 
-        else:
-            print("Need at least 2 element in stack\n")
+        a = self.stack.pop()
+        b = self.stack.pop()
+        self.stack.append(a)
+        self.stack.append(b)
 
     def clear(self):
         while len(self.stack) > 0:
             self.stack.pop()
 
     def conv(self):
-        if self.stack.__len__() == 0:
-            print("Stack is empty\n")
-            return -1
         a = self.stack.pop()
         if not a.isdigit() and self.isfloat(a):
             print("No conversion support for float")
@@ -124,10 +112,8 @@ class rc_stack:
         else:
             print(self.stack[len(self.stack) - 1])
 
+    # TODO: fix that so we push back a string instead of an int?
     def integer(self):
-        if self.stack.__len__() == 0:
-            print("Stack is empty\n")
-            return -1
         tmp = self.stack.pop()
         if self.isfloat(tmp):
             self.stack.append(int(float(tmp)))
@@ -164,25 +150,16 @@ class rc_stack:
             self.stack.append(v.__str__())
 
     def add(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] + values[0]
         self.stack_in_base(res)
 
     def sub(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] - values[0]
         self.stack_in_base(res)
 
     def div(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_float()
         if values == None:
             values = self.get_top_2_as_dec()
@@ -190,142 +167,85 @@ class rc_stack:
         self.stack_in_base(res)
 
     def mul(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] * values[0]
         self.stack_in_base(res)
 
     def mod(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] % values[0]
         self.stack_in_base(res)
 
     def pow(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = math.pow(values[1], values[0])
         self.stack_in_base(res)
 
     def sqr(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(math.sqrt(val))
 
     def in2cm(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(2.54 * val)
 
     def cm2in(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(0.393700787 * val)
 
     def km2mi(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(0.621371192 * val)
 
     def mi2km(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(1.609344 * val)
 
     def m2y(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(1.0936133 * val)
 
     def y2m(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(0.9144 * val)
 
     def kg2lbs(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(2.20462262 * val)
 
     def lbs2kg(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(0.45359237 * val)
 
     def c2f(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base((val * 1.8) + 32)
 
     def f2c(self):
-        if len(self.stack) < 1:
-            print("Not enough element in stack\n")
-            return
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base((val - 32) /  1.8)
 
     def bin_and(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] & values[0]
         self.stack_in_base(res)
 
     def bin_xor(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] ^ values[0]
         self.stack_in_base(res)
 
     def bin_or(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] | values[0]
         self.stack_in_base(res)
 
     def lsh(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] << values[0]
         self.stack_in_base(res)
 
     def rsh(self):
-        if len(self.stack) < 2:
-            print("Not enough element in stack\n")
-            return
         values = self.get_top_2_as_dec()
         res = values[1] >> values[0]
         self.stack_in_base(res)
@@ -385,6 +305,10 @@ class rc_stack:
     # process
     def process(self, v):
         if self.cmds.__contains__(v):
+            if len(self.stack) < self.lens[v]:
+                print("Not enough element in stack: %d needed, %d in stack\n" %
+                        (self.lens[v], len(self.stack)))
+                return -1
             if self.cmds[v]() == 0:
                 return 0
         return -1
