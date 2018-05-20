@@ -112,11 +112,10 @@ class rc_stack:
         else:
             print(self.stack[len(self.stack) - 1])
 
-    # TODO: fix that so we push back a string instead of an int?
     def integer(self):
         tmp = self.stack.pop()
         if self.isfloat(tmp):
-            self.stack.append(int(float(tmp)))
+            self.stack.append(str(int(float(tmp))))
         else:
             print("not a float")
 
