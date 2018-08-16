@@ -390,7 +390,11 @@ else:
     readline.parse_and_bind('tab: complete')
     readline.parse_and_bind('set editing-mode emacs')
     while 1:
-        data = rc_input("[%s] rcpy> " % (s.get_base()))
+        try:
+            data = rc_input("[%s] rcpy> " % (s.get_base()))
+        except (EOFError, KeyboardInterrupt) as e:
+            s.quit()
+
         data = data.split()
         input_processing(data)
 
