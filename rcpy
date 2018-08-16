@@ -85,7 +85,7 @@ class rc_stack:
     def duplicate(self):
         a = self.stack.pop()
         self.stack.append(a)
-        self.stack.append(a)
+        self.push(a)
 
     def print_last(self):
         print(self.stack[len(self.stack) - 1])
@@ -93,12 +93,18 @@ class rc_stack:
     def swap(self):
         a = self.stack.pop()
         b = self.stack.pop()
-        self.stack.append(a)
-        self.stack.append(b)
+        self.push(a)
+        self.push(b)
 
     def clear(self):
         while len(self.stack) > 0:
             self.stack.pop()
+
+    def conv_print(self, before, after):
+        if self.tty:
+            print(str(before) + " -> " + str(after))
+        else:
+            print(after)
 
     def conv(self):
         a = self.stack.pop()
@@ -107,10 +113,7 @@ class rc_stack:
             self.stack.append(a)
             return
         self.stack_in_base(self.get_as_dec(a))
-        if self.tty:
-            print(a + " -> " + self.stack[len(self.stack) - 1])
-        else:
-            print(self.stack[len(self.stack) - 1])
+        self.conv_print(a, self.stack[len(self.stack) - 1])
 
     def integer(self):
         tmp = self.stack.pop()
@@ -184,45 +187,44 @@ class rc_stack:
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base(math.sqrt(val))
 
-    def in2cm(self):
+    def conv_with_coef(self, coef):
         val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(2.54 * val)
+        self.stack_in_base(coef * val)
+        self.conv_print(val, self.stack[len(self.stack) - 1])
+
+    def in2cm(self):
+        self.conv_with_coef(2.54)
 
     def cm2in(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(0.393700787 * val)
+        self.conv_with_coef(0.393700787)
 
     def km2mi(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(0.621371192 * val)
+        self.conv_with_coef(0.621371192)
 
     def mi2km(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(1.609344 * val)
+        self.conv_with_coef(1.609344)
 
     def m2y(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(1.0936133 * val)
+        self.conv_with_coef(1.0936133)
 
     def y2m(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(0.9144 * val)
+        self.conv_with_coef(0.9144)
 
     def kg2lbs(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(2.20462262 * val)
+        self.conv_with_coef(2.20462262)
 
     def lbs2kg(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(0.45359237 * val)
+        self.conv_with_coef(0.45359237, val)
 
     def c2f(self):
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base((val * 1.8) + 32)
+        self.conv_print(val, self.stack[len(self.stack) - 1])
 
     def f2c(self):
         val = self.get_as_dec(self.stack.pop())
         self.stack_in_base((val - 32) /  1.8)
+        self.conv_print(val, self.stack[len(self.stack) - 1])
 
     def bin_and(self):
         values = self.get_top_2_as_dec()
