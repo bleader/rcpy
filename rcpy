@@ -3,8 +3,8 @@
 import sys
 import os
 import math
-from copy import copy
 import readline
+from colorama import Fore
 
 bin = "01"
 hexa = "0123456789ABCDEFabcdef"
@@ -132,7 +132,8 @@ class rc_stack:
         self.base = "dec"
 
     def quit(self):
-        print("Bye.")
+        print("\n%s--%s Bye %s--%s" %
+                (Fore.MAGENTA, Fore.RESET, Fore.MAGENTA, Fore.RESET))
         sys.exit()
 
     def help(self):
