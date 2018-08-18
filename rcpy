@@ -9,6 +9,9 @@ from colorama import Fore
 bin = "01"
 hexa = "0123456789ABCDEFabcdef"
 
+errstr = Fore.RED + "error" + Fore.RESET + ":"
+warnstr = Fore.MAGENTA + "warning" + Fore.RESET + ":"
+
 class rc_stack:
 
     def __init__(self):
@@ -316,11 +319,12 @@ class rc_stack:
     def process(self, v):
         if self.cmds.__contains__(v):
             if len(self.stack) < self.lens[v]:
-                print("Not enough element in stack: %d needed, %d in stack\n" %
-                        (self.lens[v], len(self.stack)))
+                print("%s Not enough element in stack: %d needed, %d in stack\n" %
+                        (errstr, self.lens[v], len(self.stack)))
                 return -1
-            if self.cmds[v]() == 0:
-                return 0
+
+            self.cmds[v]()
+            return 0
         return -1
 
     # accessors
@@ -349,21 +353,21 @@ def input_processing(input):
                 s.set_macro(input[idx+1:])
                 input.clear()
             continue
-        if i == '@':
+        elif i == '@':
             idx = input.index(i)
             if len(input[idx+1:]) > 0:
                 input_processing(s.get_macro(input[idx+1]))
                 input.pop(idx)
             continue
-        if s.process(i) == 0:
+        elif s.process(i) == 0:
             continue
-        if i.isdigit():
+        elif i.isdigit():
             s.push(i)
             continue
-        if s.isfloat(i):
+        elif s.isfloat(i):
             s.push(i)
             continue
-        if i.startswith("0b"):
+        elif i.startswith("0b"):
             tmp = i.lstrip("0b")
             s.push(i)
             for c in tmp:
@@ -372,7 +376,7 @@ def input_processing(input):
                     print("Not a valid binary value")
                     break
             continue
-        if i.startswith("0x"):
+        elif i.startswith("0x"):
             tmp = i.lstrip("0x")
             s.push(i)
             for c in tmp:
@@ -381,6 +385,8 @@ def input_processing(input):
                     print("not a valid hexadecimal value")
                     break
             continue
+        else:
+            print("%s Unknown command %s, ignoring it." % (errstr, i))
 
 s = rc_stack()
 
