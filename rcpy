@@ -12,72 +12,76 @@ hexa = "0123456789ABCDEFabcdef"
 errstr = Fore.RED + "error" + Fore.RESET + ":"
 warnstr = Fore.MAGENTA + "warning" + Fore.RESET + ":"
 
+class Command:
+    def __init__(self, func, minlen):
+        self.func = func
+        self.len = minlen
+
 class rc_stack:
 
     def __init__(self):
 
         self.cmds = {}
-        self.lens = {}
         self.stack = []
         self.macros = {}
         self.base = "dec"
         self.tty = True
 
         # stack manipulation
-        self.cmds['pop'], self.lens['pop'] =            self.pop,       1
-        self.cmds['dump'], self.lens['dump'] =          self.dump,      0
-        self.cmds['d'], self.lens['d'] =                self.duplicate, 1
-        self.cmds['p'], self.lens['p'] =                self.print_last,1
-        self.cmds['print'], self.lens['print'] =        self.print_last,1
-        self.cmds['r'], self.lens['r'] =                self.swap,      2
-        self.cmds['swap'], self.lens['swap'] =          self.swap,      2
-        self.cmds['c'], self.lens['c'] =                self.clear,     0
-        self.cmds['clear'], self.lens['clear'] =        self.clear,     0
-        self.cmds['conv'], self.lens['conv'] =          self.conv,      0
-        self.cmds['int'], self.lens['int'] =            self.integer,   1
+        self.cmds['pop'] = Command(self.pop, 1)
+        self.cmds['dump'] = Command(self.dump, 0)
+        self.cmds['d'] = Command(self.duplicate, 1)
+        self.cmds['p'] = Command(self.print_last, 0)
+        self.cmds['print'] = Command(self.print_last, 0)
+        self.cmds['r'] = Command(self.swap, 2)
+        self.cmds['swap'] = Command(self.swap, 2)
+        self.cmds['c'] = Command(self.clear, 0)
+        self.cmds['clear'] = Command(self.clear, 0)
+        self.cmds['conv'] = Command(self.conv, 0)
+        self.cmds['int'] = Command(self.integer, 1)
 
         # change output base
-        self.cmds['hex'], self.lens['hex'] =            self.hex,       0
-        self.cmds['bin'], self.lens['bin'] =            self.bin,       0
-        self.cmds['dec'], self.lens['dec'] =            self.dec,       0
+        self.cmds['hex'] = Command(self.hex, 0)
+        self.cmds['bin'] = Command(self.bin, 0)
+        self.cmds['dec'] = Command(self.dec, 0)
 
         # control
-        self.cmds['quit'], self.lens['quit'] =          self.quit,      0
-        self.cmds['q'], self.lens['q'] =                self.quit,      0
+        self.cmds['quit'] = Command(self.quit, 0)
+        self.cmds['q'] = Command(self.quit, 0)
 
         # operations
-        self.cmds['+'], self.lens['+'] =                self.add,       2
-        self.cmds['-'], self.lens['-'] =                self.sub,       2
-        self.cmds['/'], self.lens['/'] =                self.div,       2
-        self.cmds['*'], self.lens['*'] =                self.mul,       2
-        self.cmds['x'], self.lens['x'] =                self.mul,       2
-        self.cmds['%'], self.lens['%'] =                self.mod,       2
-        self.cmds['^'], self.lens['^'] =                self.pow,       2
-        self.cmds['v'], self.lens['v'] =                self.sqr,       1
+        self.cmds['+'] = Command(self.add, 2)
+        self.cmds['-'] = Command(self.sub, 2)
+        self.cmds['/'] = Command(self.div, 2)
+        self.cmds['*'] = Command(self.mul, 2)
+        self.cmds['x'] = Command(self.mul, 2)
+        self.cmds['%'] = Command(self.mod, 2)
+        self.cmds['^'] = Command(self.pow, 2)
+        self.cmds['v'] = Command(self.sqr, 1)
 
         # binary operations
-        self.cmds['&'], self.lens['&'] =                self.bin_and,   2
-        self.cmds['xor'], self.lens['xor'] =            self.bin_xor,   2
-        self.cmds['|'], self.lens['|'] =                self.bin_or,    2
-        self.cmds['<<'], self.lens['<<'] =              self.lsh,       2
-        self.cmds['>>'], self.lens['>>'] =              self.rsh,       2
+        self.cmds['&'] = Command(self.bin_and, 2)
+        self.cmds['xor'] = Command(self.bin_xor, 2)
+        self.cmds['|'] = Command(self.bin_or, 2)
+        self.cmds['<<'] = Command(self.lsh, 2)
+        self.cmds['>>'] = Command(self.rsh, 2)
 
-        self.cmds['help'], self.lens['help'] =          self.help,      0
-        self.cmds['h'], self.lens['h'] =                self.help,      0
+        self.cmds['help'] = Command(self.help, 0)
+        self.cmds['h'] = Command(self.help, 0)
 
         # conversions
-        self.cmds['cm2in'], self.lens['cm2in'] =        self.cm2in,     1
-        self.cmds['in2cm'], self.lens['in2cm'] =        self.in2cm,     1
-        self.cmds['cm2ft'], self.lens['cm2ft'] =        self.cm2ft,     1
-        self.cmds['ft2cm'], self.lens['ft2cm'] =        self.ft2cm,     1
-        self.cmds['km2mi'], self.lens['km2mi'] =        self.km2mi,     1
-        self.cmds['mi2km'], self.lens['mi2km'] =        self.mi2km,     1
-        self.cmds['m2y'], self.lens['m2y'] =            self.m2y,       1
-        self.cmds['y2m'], self.lens['y2m'] =            self.y2m,       1
-        self.cmds['kg2lbs'], self.lens['kg2lbs'] =      self.kg2lbs,    1
-        self.cmds['lbs2kg'], self.lens['lbs2kg'] =      self.lbs2kg,    1
-        self.cmds['c2f'], self.lens['c2f'] =            self.c2f,       1
-        self.cmds['f2c'], self.lens['f2c'] =            self.f2c,       1
+        self.cmds['cm2in'] = Command(self.cm2in, 1)
+        self.cmds['in2cm'] = Command(self.in2cm, 1)
+        self.cmds['cm2ft'] = Command(self.cm2ft, 1)
+        self.cmds['ft2cm'] = Command(self.ft2cm, 1)
+        self.cmds['km2mi'] = Command(self.km2mi, 1)
+        self.cmds['mi2km'] = Command(self.mi2km, 1)
+        self.cmds['m2y'] = Command(self.m2y, 1)
+        self.cmds['y2m'] = Command(self.y2m, 1)
+        self.cmds['kg2lbs'] = Command(self.kg2lbs, 1)
+        self.cmds['lbs2kg'] = Command(self.lbs2kg, 1)
+        self.cmds['c2f'] = Command(self.c2f, 1)
+        self.cmds['f2c'] = Command(self.f2c, 1)
 
     # command to execute
     def pop(self):
@@ -324,12 +328,12 @@ class rc_stack:
     # process
     def process(self, v):
         if self.cmds.__contains__(v):
-            if len(self.stack) < self.lens[v]:
+            if len(self.stack) < self.cmds[v].len:
                 print("%s Not enough element in stack: %d needed, %d in stack\n" %
-                        (errstr, self.lens[v], len(self.stack)))
+                        (errstr, self.cmds[v].len, len(self.stack)))
                 return -1
 
-            self.cmds[v]()
+            self.cmds[v].func()
             return 0
         return -1
 
