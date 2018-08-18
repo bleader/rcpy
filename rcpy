@@ -195,7 +195,13 @@ class rc_stack:
 
     def conv_with_coef(self, coef):
         val = self.get_as_dec(self.stack.pop())
+        oldbase = 'dec'
+        if self.base != 'dec':
+            print("%s ignoring base %s for conversion" % (warnstr, self.base))
+            oldbase = self.base
+            self.base = 'dec'
         self.stack_in_base(coef * val)
+        self.base = oldbase
         self.conv_print(val, self.stack[len(self.stack) - 1])
 
     def in2cm(self):
