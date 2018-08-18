@@ -65,6 +65,8 @@ class rc_stack:
         # conversions
         self.cmds['cm2in'], self.lens['cm2in'] =        self.cm2in,     1
         self.cmds['in2cm'], self.lens['in2cm'] =        self.in2cm,     1
+        self.cmds['cm2ft'], self.lens['cm2ft'] =        self.cm2ft,     1
+        self.cmds['ft2cm'], self.lens['ft2cm'] =        self.ft2cm,     1
         self.cmds['km2mi'], self.lens['km2mi'] =        self.km2mi,     1
         self.cmds['mi2km'], self.lens['mi2km'] =        self.mi2km,     1
         self.cmds['m2y'], self.lens['m2y'] =            self.m2y,       1
@@ -198,6 +200,12 @@ class rc_stack:
 
     def cm2in(self):
         self.conv_with_coef(0.393700787)
+
+    def cm2ft(self):
+        self.conv_with_coef(0.0328084)
+
+    def ft2cm(self):
+        self.conv_with_coef(30.48)
 
     def km2mi(self):
         self.conv_with_coef(0.621371192)
