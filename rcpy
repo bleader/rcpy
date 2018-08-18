@@ -84,8 +84,8 @@ class rc_stack:
         print("pop: " + self.stack.pop())
 
     def dump(self):
-        for i in self.stack:
-            print(i)
+        for idx, val in enumerate(self.stack):
+            print("%s%d%s: %s" % (Fore.GREEN, idx, Fore.RESET, val))
 
     def duplicate(self):
         a = self.stack.pop()
