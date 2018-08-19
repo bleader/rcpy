@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -6,16 +6,27 @@ import math
 import readline
 from colorama import Fore
 
-bin = "01"
-hexa = "0123456789ABCDEFabcdef"
-
 errstr = Fore.RED + "error" + Fore.RESET + ":"
 warnstr = Fore.MAGENTA + "warning" + Fore.RESET + ":"
 
+class Entry:
+    def __init__(self, val, base):
+        self.val = val
+        self.base = base
+
+    def __str__(self):
+        if self.base == 10:
+            return str(self.val)
+        elif self.base == 16:
+            return hex(self.val)
+        elif self.base == 2:
+            return bin(self.val)
+
 class Command:
-    def __init__(self, func, minlen):
-        self.func = func
-        self.len = minlen
+    def __init__(self, func, minlen, poplen):
+        self.func = func    # function to call
+        self.len = minlen   # minimum len of stack
+        self.pop = poplen   # number of elements to pop and pass to function
 
 class rc_stack:
 
@@ -24,325 +35,141 @@ class rc_stack:
         self.cmds = {}
         self.stack = []
         self.macros = {}
-        self.base = "dec"
+        self.base = ("dec", 10)
         self.tty = True
 
         # stack manipulation
-        self.cmds['pop'] = Command(self.pop, 1)
-        self.cmds['dump'] = Command(self.dump, 0)
-        self.cmds['d'] = Command(self.duplicate, 1)
-        self.cmds['p'] = Command(self.print_last, 0)
-        self.cmds['print'] = Command(self.print_last, 0)
-        self.cmds['r'] = Command(self.swap, 2)
-        self.cmds['swap'] = Command(self.swap, 2)
-        self.cmds['c'] = Command(self.clear, 0)
-        self.cmds['clear'] = Command(self.clear, 0)
-        self.cmds['conv'] = Command(self.conv, 0)
-        self.cmds['int'] = Command(self.integer, 1)
+        # cmd in dict           ctor    function        len pop
+        #####################   #$##### ##########      ### ###
+        self.cmds['pop'] =      Command(self.pop,       1,  1)
+        self.cmds['dump'] =     Command(self.dump,      0,  0)
+        self.cmds['d'] =        Command(self.duplicate, 1,  0)
+        self.cmds['p'] =        Command(self.print_last,0,  0)
+        self.cmds['print'] =    Command(self.print_last,0,  0)
+        self.cmds['r'] =        Command(self.swap,      2,  2)
+        self.cmds['swap'] =     Command(self.swap,      2,  2)
+        self.cmds['c'] =        Command(self.clear,     0,  0)
+        self.cmds['clear'] =    Command(self.clear,     0,  0)
+        self.cmds['conv'] =     Command(self.conv,      0,  0)
+        self.cmds['int'] =      Command(self.integer,   1,  0)
 
         # change output base
-        self.cmds['hex'] = Command(self.hex, 0)
-        self.cmds['bin'] = Command(self.bin, 0)
-        self.cmds['dec'] = Command(self.dec, 0)
+        #####################   #$##### ##########      ### ###
+        self.cmds['hex'] =      Command(self.base_hex,  0,  0)
+        self.cmds['bin'] =      Command(self.base_bin,  0,  0)
+        self.cmds['dec'] =      Command(self.base_dec,  0,  0)
 
         # control
-        self.cmds['quit'] = Command(self.quit, 0)
-        self.cmds['q'] = Command(self.quit, 0)
+        #####################   #$##### ##########      ### ###
+        self.cmds['quit'] =     Command(self.quit,      0,  0)
+        self.cmds['q'] =        Command(self.quit,      0,  0)
+        self.cmds['help'] =     Command(self.help,      0,  0)
+        self.cmds['h'] =        Command(self.help,      0,  0)
 
         # operations
-        self.cmds['+'] = Command(self.add, 2)
-        self.cmds['-'] = Command(self.sub, 2)
-        self.cmds['/'] = Command(self.div, 2)
-        self.cmds['*'] = Command(self.mul, 2)
-        self.cmds['x'] = Command(self.mul, 2)
-        self.cmds['%'] = Command(self.mod, 2)
-        self.cmds['^'] = Command(self.pow, 2)
-        self.cmds['v'] = Command(self.sqr, 1)
+        #####################   #$##### ##########      ### ###
+        self.cmds['+'] =        Command(self.add,       2,  2)
+        self.cmds['-'] =        Command(self.sub,       2,  2)
+        self.cmds['/'] =        Command(self.div,       2,  2)
+        self.cmds['*'] =        Command(self.mul,       2,  2)
+        self.cmds['x'] =        Command(self.mul,       2,  2)
+        self.cmds['%'] =        Command(self.mod,       2,  2)
+        self.cmds['^'] =        Command(self.pow,       2,  2)
+        self.cmds['v'] =        Command(self.sqr,       1,  1)
 
         # binary operations
-        self.cmds['&'] = Command(self.bin_and, 2)
-        self.cmds['xor'] = Command(self.bin_xor, 2)
-        self.cmds['|'] = Command(self.bin_or, 2)
-        self.cmds['<<'] = Command(self.lsh, 2)
-        self.cmds['>>'] = Command(self.rsh, 2)
-
-        self.cmds['help'] = Command(self.help, 0)
-        self.cmds['h'] = Command(self.help, 0)
+        #####################   #$##### ##########      ### ###
+        self.cmds['&'] =        Command(self.bin_and,   2,  2)
+        self.cmds['xor'] =      Command(self.bin_xor,   2,  2)
+        self.cmds['|'] =        Command(self.bin_or,    2,  2)
+        self.cmds['<<'] =       Command(self.lsh,       2,  2)
+        self.cmds['>>'] =       Command(self.rsh,       2,  2)
 
         # conversions
-        self.cmds['cm2in'] = Command(self.cm2in, 1)
-        self.cmds['in2cm'] = Command(self.in2cm, 1)
-        self.cmds['cm2ft'] = Command(self.cm2ft, 1)
-        self.cmds['ft2cm'] = Command(self.ft2cm, 1)
-        self.cmds['km2mi'] = Command(self.km2mi, 1)
-        self.cmds['mi2km'] = Command(self.mi2km, 1)
-        self.cmds['m2y'] = Command(self.m2y, 1)
-        self.cmds['y2m'] = Command(self.y2m, 1)
-        self.cmds['kg2lbs'] = Command(self.kg2lbs, 1)
-        self.cmds['lbs2kg'] = Command(self.lbs2kg, 1)
-        self.cmds['c2f'] = Command(self.c2f, 1)
-        self.cmds['f2c'] = Command(self.f2c, 1)
+        #####################   #$##### ##########      ### ###
+        self.cmds['cm2in'] =    Command(self.cm2in,     1,  0)
+        self.cmds['in2cm'] =    Command(self.in2cm,     1,  0)
+        self.cmds['cm2ft'] =    Command(self.cm2ft,     1,  0)
+        self.cmds['ft2cm'] =    Command(self.ft2cm,     1,  0)
+        self.cmds['km2mi'] =    Command(self.km2mi,     1,  0)
+        self.cmds['mi2km'] =    Command(self.mi2km,     1,  0)
+        self.cmds['m2y'] =      Command(self.m2y,       1,  0)
+        self.cmds['y2m'] =      Command(self.y2m,       1,  0)
+        self.cmds['kg2lbs'] =   Command(self.kg2lbs,    1,  0)
+        self.cmds['lbs2kg'] =   Command(self.lbs2kg,    1,  0)
+        self.cmds['c2f'] =      Command(self.c2f,       1,  0)
+        self.cmds['f2c'] =      Command(self.f2c,       1,  0)
 
-    # command to execute
-    def pop(self):
-        print("pop: " + self.stack.pop())
-
-    def dump(self):
-        for idx, val in enumerate(self.stack):
-            print("%s%d%s: %s" % (Fore.GREEN, idx, Fore.RESET, val))
-
-    def duplicate(self):
-        a = self.stack.pop()
-        self.stack.append(a)
-        self.push(a)
-
-    def print_last(self):
-        print(self.stack[len(self.stack) - 1])
-
-    def swap(self):
-        a = self.stack.pop()
-        b = self.stack.pop()
-        self.push(a)
-        self.push(b)
-
-    def clear(self):
-        while len(self.stack) > 0:
-            self.stack.pop()
-
-    def conv_print(self, before, after):
+# private helpers
+    def __conv_print(self, before, after):
         if self.tty:
             print(str(before) + " -> " + str(after))
         else:
             print(after)
 
-    def conv(self):
-        a = self.stack.pop()
-        if not a.isdigit() and self.isfloat(a):
-            print("No conversion support for float")
-            self.stack.append(a)
-            return
-        self.stack_in_base(self.get_as_dec(a))
-        self.conv_print(a, self.stack[len(self.stack) - 1])
+    def __conv_with_coef(self, coef):
+        old = str(self.stack[-1])
+        self.stack[-1].val *= coef
+        self.__conv_print(old, self.stack[-1])
 
-    def integer(self):
-        tmp = self.stack.pop()
-        if self.isfloat(tmp):
-            self.stack.append(str(int(float(tmp))))
-        else:
-            print("not a float")
 
-    def hex(self):
-        self.base = "hex"
+# public helpers
+    def set_tty(self, v):
+        self.tty = v
 
-    def bin(self):
-        self.base = "bin"
-
-    def dec(self):
-        self.base = "dec"
-
-    def quit(self):
-        print("\n%s--%s Bye %s--%s" %
-                (Fore.MAGENTA, Fore.RESET, Fore.MAGENTA, Fore.RESET))
-        sys.exit()
-
-    def help(self):
-        if os.path.isfile("./rcpy.1"):
-            os.system("man ./rcpy.1")
-        else:
-            os.system("man rcpy")
-
-    def stack_in_base(self, v):
-        if self.base == "hex":
-            self.stack.append(str(hex(v)))
-        elif self.base == "bin":
-            count = 64
-            a = "".join([str((v >> y) & 1) for y in range(count-1, -1, -1)]).lstrip('0')
-            self.stack.append("0b" + a)
-        else:
-            self.stack.append(v.__str__())
-
-    def add(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] + values[0]
-        self.stack_in_base(res)
-
-    def sub(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] - values[0]
-        self.stack_in_base(res)
-
-    def div(self):
-        values = self.get_top_2_as_float()
-        if values == None:
-            values = self.get_top_2_as_dec()
-        res = values[1] / values[0]
-        self.stack_in_base(res)
-
-    def mul(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] * values[0]
-        self.stack_in_base(res)
-
-    def mod(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] % values[0]
-        self.stack_in_base(res)
-
-    def pow(self):
-        values = self.get_top_2_as_dec()
-        res = math.pow(values[1], values[0])
-        self.stack_in_base(res)
-
-    def sqr(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base(math.sqrt(val))
-
-    def conv_with_coef(self, coef):
-        val = self.get_as_dec(self.stack.pop())
-        oldbase = 'dec'
-        if self.base != 'dec':
-            print("%s ignoring base %s for conversion" % (warnstr, self.base))
-            oldbase = self.base
-            self.base = 'dec'
-        self.stack_in_base(coef * val)
-        self.base = oldbase
-        self.conv_print(val, self.stack[len(self.stack) - 1])
-
-    def in2cm(self):
-        self.conv_with_coef(2.54)
-
-    def cm2in(self):
-        self.conv_with_coef(0.393700787)
-
-    def cm2ft(self):
-        self.conv_with_coef(0.0328084)
-
-    def ft2cm(self):
-        self.conv_with_coef(30.48)
-
-    def km2mi(self):
-        self.conv_with_coef(0.621371192)
-
-    def mi2km(self):
-        self.conv_with_coef(1.609344)
-
-    def m2y(self):
-        self.conv_with_coef(1.0936133)
-
-    def y2m(self):
-        self.conv_with_coef(0.9144)
-
-    def kg2lbs(self):
-        self.conv_with_coef(2.20462262)
-
-    def lbs2kg(self):
-        self.conv_with_coef(0.45359237, val)
-
-    def c2f(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base((val * 1.8) + 32)
-        self.conv_print(val, self.stack[len(self.stack) - 1])
-
-    def f2c(self):
-        val = self.get_as_dec(self.stack.pop())
-        self.stack_in_base((val - 32) /  1.8)
-        self.conv_print(val, self.stack[len(self.stack) - 1])
-
-    def bin_and(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] & values[0]
-        self.stack_in_base(res)
-
-    def bin_xor(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] ^ values[0]
-        self.stack_in_base(res)
-
-    def bin_or(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] | values[0]
-        self.stack_in_base(res)
-
-    def lsh(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] << values[0]
-        self.stack_in_base(res)
-
-    def rsh(self):
-        values = self.get_top_2_as_dec()
-        res = values[1] >> values[0]
-        self.stack_in_base(res)
-
-    def get_top_2_as_dec(self):
-        ret = []
-        ret.append(self.get_as_dec(self.stack.pop()))
-        ret.append(self.get_as_dec(self.stack.pop()))
-        return ret
-
-    def get_as_dec(self, v):
-        # first try int
-        if v.isdigit():
-            return int(v, 10)
-        # otherwise check for float
-        if self.isfloat(v):
-            return float(v)
-        # finally have a look at bases conversion
-        if v.startswith("0x"):
-            return int(v, 16)
-        if v.startswith("0b"):
-            v = v.lstrip("0b")
-            return int(v, 2)
-
-    def get_top_2_as_float(self):
-        ret = []
-        ret.append(self.stack.pop())
-        ret.append(self.stack.pop())
-        tmp = self.get_as_float(ret[0])
-        if tmp == None:
-            self.stack.append(ret[1])
-            self.stack.append(ret[0])
-            return
-        tmp = self.get_as_float(ret[1])
-        if tmp == None:
-            self.stack.append(ret[1])
-            self.stack.append(ret[0])
-            return
-        ret[0] = float(ret[0])
-        ret[1] = float(ret[1])
-        return ret
-
-    def get_as_float(self, v):
-        try:
-            ret = float(v)
-            return ret
-        except ValueError:
-            return
-
-    def isfloat(self, v):
-        try:
-            a = float(v)
-            return True
-        except ValueError:
-            return False
-
-    # process
     def process(self, v):
         if self.cmds.__contains__(v):
             if len(self.stack) < self.cmds[v].len:
                 print("%s Not enough element in stack: %d needed, %d in stack\n" %
                         (errstr, self.cmds[v].len, len(self.stack)))
-                return -1
+                return 1
 
-            self.cmds[v].func()
+            params = []
+            for i in range(0, self.cmds[v].pop):
+                params.append(self.stack.pop())
+            self.cmds[v].func(params)
             return 0
         return -1
 
-    # accessors
-    def get_base(self):
-        return self.base
 
     def push(self, v):
-        self.stack.append(v)
+        dec = None
+
+        if v.startswith(('0x', '0X')):
+            try:
+                dec = int(v, 16)
+                base = 16
+                self.stack.append(Entry(dec, base))
+                return 0
+            except ValueError:
+                pass
+        elif v.startswith(('0b', '0B')):
+            try:
+                dec = int(v, 2)
+                base = 2
+                self.stack.append(Entry(dec, base))
+                return 0
+            except ValueError:
+                pass
+        else:
+            try:
+                dec = int(v, 10)
+                base = 10
+                self.stack.append(Entry(dec, base))
+                return 0
+            except ValueError:
+                pass
+            try:
+                dec = float(v)
+                base = 10
+                self.stack.append(Entry(dec,base))
+                return 0
+            except ValueError:
+                pass
+        return -1
+
+    def get_base(self):
+        return self.base[0]
 
     def set_macro(self, v):
         self.macros[v[0]] = v[1:]
@@ -352,12 +179,152 @@ class rc_stack:
             return self.macros[v]
         return []
 
-    def set_tty(self, v):
-        self.tty = v
+
+# app commands
+    def quit(self, _):
+        print("\n%s--%s Bye %s--%s" %
+                (Fore.MAGENTA, Fore.RESET, Fore.MAGENTA, Fore.RESET))
+        sys.exit()
+
+    def help(self, _):
+        if os.path.isfile("./rcpy.1"):
+            os.system("man ./rcpy.1")
+        else:
+            os.system("man rcpy")
+
+# stack handling
+    def pop(self, entries):
+        print("pop: " + str(entries[0].val))
+
+    def dump(self, _):
+        for idx, entry in enumerate(self.stack):
+            print("%s%d%s:" % (Fore.GREEN, idx, Fore.RESET), entry)
+
+    def duplicate(self, _):
+        self.stack.append(self.stack[-1])
+
+    def print_last(self, _):
+        print(self.stack[-1])
+
+    def swap(self, entries):
+        self.stack.append(entries[1])
+        self.stack.append(entries[0])
+
+    def clear(self, _):
+        self.stack.clear()
+
+# base handling
+    def conv(self, _):
+        a = self.stack[-1]
+        old = str(a)
+        if type(a.val) == float:
+            print("%s No conversion support for float" % errstr)
+            return
+        a.base = self.base[1]
+        self.__conv_print(old, str(self.stack[-1]))
+
+    def base_hex(self, _):
+        self.base = ("hex", 16)
+
+    def base_bin(self, _):
+        self.base = ("bin", 2)
+
+    def base_dec(self, _):
+        self.base = ("dec", 10)
+
+# actual operators
+    def add(self, entries):
+        self.stack.append(Entry(entries[0].val + entries[1].val, self.base[1]))
+
+    def sub(self, entries):
+        self.stack.append(Entry(entries[0].val - entries[1].val, self.base[1]))
+
+    def mul(self, entries):
+        self.stack.append(Entry(entries[0].val * entries[1].val, self.base[1]))
+
+    def div(self, entries):
+        self.stack.append(Entry(entries[1].val / entries[0].val, self.base[1]))
+
+    def mod(self, entries):
+        self.stack.append(Entry(entries[1].val % entries[0].val, self.base[1]))
+
+    def pow(self, entries):
+        self.stack.append(Entry(entries[1].val ** entries[0].val, self.base[1]))
+
+    def sqr(self, entries):
+        self.stack.append(Entry(math.sqrt(entries[0].val), self.base[1]))
+
+    def bin_and(self, entries):
+        self.stack.append(Entry(entries[1].val & entries[0].val, self.base[1]))
+
+    def bin_xor(self, entries):
+        self.stack.append(Entry(entries[1].val ^ entries[0].val, self.base[1]))
+
+    def bin_or(self, entries):
+        self.stack.append(Entry(entries[1].val | entries[0].val, self.base[1]))
+
+    def lsh(self, entries):
+        self.stack.append(Entry(entries[1].val << entries[0].val, self.base[1]))
+
+    def rsh(self, entries):
+        self.stack.append(Entry(entries[1].val >> entries[0].val, self.base[1]))
+
+# conversions
+    def integer(self, _):
+        last = self.stack[-1]
+        if type(last.val) == float:
+            last.val = int(last.val)
+        else:
+            print("%s not a float" % warnstr)
+
+    def in2cm(self, _):
+        self.__conv_with_coef(2.54)
+
+    def cm2in(self, _):
+        self.__conv_with_coef(0.393700787)
+
+    def cm2ft(self, _):
+        self.__conv_with_coef(0.0328084)
+
+    def ft2cm(self, _):
+        self.__conv_with_coef(30.48)
+
+    def km2mi(self, _):
+        self.__conv_with_coef(0.621371192)
+
+    def mi2km(self, _):
+        self.__conv_with_coef(1.609344)
+
+    def m2y(self, _):
+        self.__conv_with_coef(1.0936133)
+
+    def y2m(self, _):
+        self.__conv_with_coef(0.9144)
+
+    def kg2lbs(self, _):
+        self.__conv_with_coef(2.20462262)
+
+    def lbs2kg(self, _):
+        self.__conv_with_coef(0.45359237)
+
+    def c2f(self, _):
+        old = str(self.stack[-1])
+        self.stack[-1].val = (self.stack[-1].val * 1.8) + 32
+        self.__conv_print(old, self.stack[-1])
+
+    def f2c(self, _):
+        old = str(self.stack[-1])
+        self.stack[-1].val = (self.stack[-1].val - 32) / 1.8
+        self.__conv_print(old, self.stack[-1])
+
 
 def input_processing(input):
     for i in input:
-        if i == 'm':
+        if s.push(i) == 0:
+            continue
+        elif s.process(i) >= 0:
+            continue
+        elif i == 'm':
             idx = input.index(i)
             if len(input[idx+1:]) > 1:
                 s.set_macro(input[idx+1:])
@@ -368,32 +335,6 @@ def input_processing(input):
             if len(input[idx+1:]) > 0:
                 input_processing(s.get_macro(input[idx+1]))
                 input.pop(idx)
-            continue
-        elif s.process(i) == 0:
-            continue
-        elif i.isdigit():
-            s.push(i)
-            continue
-        elif s.isfloat(i):
-            s.push(i)
-            continue
-        elif i.startswith("0b"):
-            tmp = i.lstrip("0b")
-            s.push(i)
-            for c in tmp:
-                if bin.__contains__(c) != True:
-                    s.pop()
-                    print("Not a valid binary value")
-                    break
-            continue
-        elif i.startswith("0x"):
-            tmp = i.lstrip("0x")
-            s.push(i)
-            for c in tmp:
-                if hexa.__contains__(c) != True:
-                    s.pop()
-                    print("not a valid hexadecimal value")
-                    break
             continue
         else:
             print("%s Unknown command %s, ignoring it." % (errstr, i))
@@ -407,12 +348,14 @@ if sys.version_info[0] >= 3:
 else:
     rc_input = raw_input
 
-if not os.isatty((sys.stdin.fileno())):
+if len(sys.argv) > 1:
+    s.set_tty(False)
+    input_processing(sys.argv[1:])
+elif not os.isatty((sys.stdin.fileno())):
     s.set_tty(False)
     data = sys.stdin.readlines()
     for i in data:
         input_processing(i.split())
-
 else:
     readline.parse_and_bind('tab: complete')
     readline.parse_and_bind('set editing-mode emacs')
