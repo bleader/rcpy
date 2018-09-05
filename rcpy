@@ -341,13 +341,6 @@ def input_processing(input):
 
 s = rc_stack()
 
-# check if we are python2 on 3 to use input or raw_input
-# which allow for up/down arrows
-if sys.version_info[0] >= 3:
-    rc_input = input
-else:
-    rc_input = raw_input
-
 if len(sys.argv) > 1:
     s.set_tty(False)
     input_processing(sys.argv[1:])
@@ -361,7 +354,7 @@ else:
     readline.parse_and_bind('set editing-mode emacs')
     while 1:
         try:
-            data = rc_input("[%s] rcpy> " % (s.get_base()))
+            data = input("[%s] rcpy> " % (s.get_base()))
         except (EOFError, KeyboardInterrupt) as e:
             s.quit()
 
