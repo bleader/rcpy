@@ -237,7 +237,7 @@ class rc_stack:
         self.stack.append(Entry(entries[0].val + entries[1].val, self.base[1]))
 
     def sub(self, entries):
-        self.stack.append(Entry(entries[0].val - entries[1].val, self.base[1]))
+        self.stack.append(Entry(entries[1].val - entries[0].val, self.base[1]))
 
     def mul(self, entries):
         self.stack.append(Entry(entries[0].val * entries[1].val, self.base[1]))
