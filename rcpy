@@ -207,8 +207,8 @@ class rc_stack:
         print(self.stack[-1])
 
     def swap(self, entries):
-        self.stack.append(entries[1])
         self.stack.append(entries[0])
+        self.stack.append(entries[1])
 
     def clear(self, _):
         self.stack.clear()
